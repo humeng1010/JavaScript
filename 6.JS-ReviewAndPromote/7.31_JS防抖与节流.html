@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>防抖与节流</title>
+</head>
+
+<body>
+    <h3>模拟防抖(输入间隔大于一秒发送请求，如果小于一秒(函数被频繁调用)则清除上一个定时器再重新生成本次的定时器)</h3>
+    搜索框:<input type="text">
+
+    <h3>模拟节流(大于指定的时间发送请求)</h3>
+    搜索框2:<input type="text">
+
+
+    <script>
+        // 首先设定一个定时器为null
+        let timer = null
+        const inp = document.querySelector("input");
+        //#region 
+        /* inp.oninput = function () {
+            // 如果定时器存在，清除定时器
+            if (timer) {
+                clearTimeout(timer)
+            }
+            // 重新调用setTimeout
+            timer = setTimeout(() => {
+                console.log('ajax发送请求');
+                timer = null
+            }, 1000);
+        } */
+        //#endregion
+        inp.oninput = debounce(() => {
+            console.log('ajax请求');
+        }, 1000)
+
+        // 封装防抖函数
+        function debounce(fn, delay) {
+            let timer = null;
+            return (...args) => {
+                // 如果定时器存在，清除定时器
+                if (timer) {
+                    clearTimeout(timer)
+                }
+                // 重新调用setTimeout
+                timer = setTimeout(() => {
+                    fn.apply(this, args)
+                }, delay);
+            }
+        }
+
+
+        // 节流
+        const inp2 = document.querySelectorAll("input")
+        inp2[1].oninput = throttle(() => {
+            console.log('ajax请求');
+        }, 1000)
+        function throttle(fn, delay) {
+            // 定义上次触发的时间
+            let last = 0
+            return (...args) => {
+                const now = +Date.now()
+                console.log('call', now, last, delay);
+                if (now - last > delay) {
+                    last = now
+                    fn.apply(this, args)
+                }
+            }
+
+        }
+    </script>
+
+</body>
+
+</html>
